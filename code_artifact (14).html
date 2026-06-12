@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育相談研修 ほっこり意見あつめボード 🎈</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Zen Maru Gothic & Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', 'Quicksand', sans-serif;
+            color: #5c4a3c;
+            background-color: #fefbf6; /* ぬくもりのあるミルク色 */
+        }
+        
+        .sticky-note {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 24px;
+            box-shadow: 0 8px 16px rgba(92, 74, 60, 0.05);
+        }
+        
+        .sticky-note:hover {
+            transform: translateY(-6px) scale(1.02) rotate(1.5deg);
+            box-shadow: 0 15px 25px rgba(220, 150, 100, 0.12);
+        }
+
+        .sticky-note:nth-child(even):hover {
+            transform: translateY(-6px) scale(1.02) rotate(-1.5deg);
+        }
+
+        .bouncy-btn {
+            transition: all 0.2s ease;
+        }
+        .bouncy-btn:hover {
+            transform: scale(1.06);
+        }
+        .bouncy-btn:active {
+            transform: scale(0.95);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #faf4eb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ebd8c5;
+            border-radius: 10px;
+            border: 2px solid #faf4eb;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4bda7;
+        }
+
+        .slide-card {
+            transition: all 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION & HEADER -->
+    <header class="bg-white/80 backdrop-blur-md border-b-4 border-[#ebd8c5] sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Title & Cute Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-[#ffb7b2] text-white p-3 rounded-[1.5rem] flex items-center justify-center shadow-md animate-bounce" style="animation-duration: 3s;">
+                        <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black text-[#5c4a3c] leading-tight flex items-center gap-1.5">
+                            <span>教育相談研修 ほっこり意見あつめボード</span>
+                            <span class="text-xl">🎈</span>
+                        </h1>
+                        <p class="text-xs text-[#c0a894] font-bold">先生たちのやさしい対話と、あしたからの「ちいさな一歩」をつなぐリアルタイムパッケージ 🌸</p>
+                    </div>
+                </div>
+
+                <!-- Simulation & Live Indicator & Admin Lock -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Dynamic Join QR Button -->
+                    <button id="showQrBtn" onclick="openQrModal()" class="bouncy-btn flex items-center space-x-1.5 px-3.5 py-2 bg-emerald-50 border-2 border-emerald-200 text-emerald-700 rounded-full text-xs font-bold shadow-sm">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <span>スマホ参加QR 📱</span>
+                    </button>
+
+                    <!-- Organizer Mode Indicator Button (Admin Toggle) -->
+                    <button id="adminLoginBtn" onclick="openAdminModal()" class="bouncy-btn flex items-center space-x-1.5 px-4 py-2 bg-[#fdf2e9] border-2 border-[#ffd8b3] text-[#d35400] rounded-full text-xs font-bold shadow-sm">
+                        <i class="fa-solid fa-key" id="adminBtnIcon"></i>
+                        <span id="adminBtnText">主催者ログイン 🔑</span>
+                    </button>
+
+                    <!-- Active User Counter -->
+                    <div class="flex items-center space-x-1 text-[#7a6452] bg-[#f5ebe0] border border-[#e3d5ca] px-3 py-2 rounded-full text-xs font-bold shadow-sm">
+                        <i class="fa-solid fa-users text-[#ffb7b2]"></i>
+                        <span id="activeUsersCount" class="font-black text-sm text-[#ff9aa2]">1</span><span>にんで対話中 🌱</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="bg-[#faf4eb] border-t-2 border-[#ebd8c5] px-4">
+            <div class="max-w-7xl mx-auto flex space-x-2 py-2 overflow-x-auto">
+                <button onclick="switchTab('intro')" id="tab-intro" class="tab-btn bouncy-btn px-4 py-2.5 text-sm font-black rounded-full text-[#7a6452] hover:bg-white/70 transition-all flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-lock text-[#ff9aa2] mr-0.5" id="lock-icon-intro"></i>
+                    <i class="fa-solid fa-desktop"></i>
+                    <span>研修スライド進行 🧸</span>
+                </button>
+                <button onclick="switchTab('session1')" id="tab-session1" class="tab-btn bouncy-btn px-4 py-2.5 text-sm font-black rounded-full text-[#7a6452] hover:bg-white/70 transition-all flex items-center space-x-1.5 whitespace-nowrap">
+                    <span class="bg-[#ffd3b6] text-[#b06124] text-[10px] px-2 py-0.5 rounded-full font-bold">ワーク1</span>
+                    <i class="fa-solid fa-heart text-[#ff9aa2]"></i>
+                    <span>大切にしたいマインド 🍓</span>
+                </button>
+                <button onclick="switchTab('session2')" id="tab-session2" class="tab-btn bouncy-btn px-4 py-2.5 text-sm font-black rounded-full text-[#7a6452] hover:bg-white/70 transition-all flex items-center space-x-1.5 whitespace-nowrap">
+                    <span class="bg-[#b5ead7] text-[#2c7a5f] text-[10px] px-2 py-0.5 rounded-full font-bold">ワーク2</span>
+                    <i class="fa-solid fa-wand-magic-sparkles text-[#77cca4]"></i>
+                    <span>あしたからの一歩 🍈</span>
+                </button>
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn bouncy-btn px-4 py-2.5 text-sm font-black rounded-full text-[#7a6452] hover:bg-white/70 transition-all flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie text-[#ebd8c5]"></i>
+                    <span>あつまった記録・分析 📊</span>
+                </button>
+                <button onclick="switchTab('guide')" id="tab-guide" class="tab-btn bouncy-btn px-4 py-2.5 text-sm font-black rounded-full text-[#7a6452] hover:bg-white/70 transition-all flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-lock text-[#ebd8c5] mr-0.5" id="lock-icon-guide"></i>
+                    <i class="fa-solid fa-book-open text-[#ffcaa6]"></i>
+                    <span>主催者のための虎の巻 📋</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ==================== TAB 1: INTRO & SLIDE PRESENTATION ==================== -->
+        <section id="content-intro" class="tab-content hidden space-y-8">
+            <!-- Cute Hero banner -->
+            <div class="bg-gradient-to-r from-[#ffb7b2] via-[#ffd3b6] to-[#e2f0cb] rounded-[2rem] p-6 sm:p-10 text-[#5c4a3c] shadow-lg relative overflow-hidden border-4 border-white">
+                <div class="absolute -right-6 -bottom-6 text-white/20 text-9xl font-bold select-none pointer-events-none">
+                    <i class="fa-solid fa-school"></i>
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="max-w-2xl">
+                        <span class="bg-white/80 text-[#d66870] text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                            スライド不要！そのまま映せる研修プログラム ☕
+                        </span>
+                        <h2 class="text-xl sm:text-3xl font-black mt-3 tracking-tight text-[#4d3a2e] leading-relaxed">
+                            教育相談研修 ほっこり対話＆実践ワーク
+                        </h2>
+                        <p class="mt-2 text-[#735c4b] font-bold text-xs sm:text-sm">
+                            プロジェクターやモニターにこの画面を映すだけで、説明・ワーク・全体共有・振り返りまでがリアルタイムにスムーズ進行できます。
+                        </p>
+                    </div>
+                    <!-- Slide Mini QR Code Area -->
+                    <div class="bg-white p-3 rounded-2xl shadow-md flex flex-col items-center border border-[#ebd8c5]">
+                        <img id="slideQrImg" src="" alt="Join QR Code" class="w-24 h-24 bg-gray-100">
+                        <span class="text-[10px] font-black text-emerald-700 mt-1">スマホ参加用QR 📱</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE SLIDE AREA -->
+            <div class="bg-white border-4 border-[#ebd8c5] rounded-[2.5rem] p-6 sm:p-8 shadow-sm space-y-6 relative">
+                <!-- Slide Header / Progress Indicator -->
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-[#faf4eb] pb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-black text-[#a68d77] uppercase bg-[#faf4eb] px-3 py-1.5 rounded-full">
+                            進行ステップ (<span id="currentSlideNum">1</span>/5)
+                        </span>
+                        <h3 id="slideBadge" class="text-sm font-black text-[#ff8b94]">アイスブレイク 🌸</h3>
+                    </div>
+                    <!-- Slide Indicators dots -->
+                    <div class="flex space-x-1.5" id="slideDots">
+                        <span class="w-3 h-3 rounded-full bg-[#ffb7b2] cursor-pointer" onclick="goToSlide(0)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-200 cursor-pointer" onclick="goToSlide(1)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-200 cursor-pointer" onclick="goToSlide(2)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-200 cursor-pointer" onclick="goToSlide(3)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-200 cursor-pointer" onclick="goToSlide(4)"></span>
+                    </div>
+                </div>
+
+                <!-- SLIDE CONTAINER -->
+                <div class="min-h-[300px] flex flex-col justify-between py-2">
+                    
+                    <!-- SLIDE 1: INTRO / ICEBREAK -->
+                    <div id="slide-0" class="slide-card block space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-5xl">🧸</div>
+                            <div>
+                                <h4 class="text-lg sm:text-2xl font-black text-[#5c4a3c] leading-tight">
+                                    ようこそ、先生たちのほっこり対話カフェへ！
+                                </h4>
+                                <p class="text-sm text-[#7a6452] font-bold mt-2 leading-relaxed">
+                                    日々の教育活動、本当にお疲れさまです。教育相談は、子どもたちが発する小さな「サイン」を受け止める大切な窓口です。<br>
+                                    でも、先生が一人で抱え込んで疲れてしまっては、あたたかい支援は届きません。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-[#fffcf5] border-2 border-dashed border-[#ffccd5] rounded-2xl p-4 mt-4">
+                            <h5 class="text-xs font-black text-[#d66870] flex items-center gap-1.5 mb-1">
+                                <i class="fa-solid fa-handshake"></i> 本日のグラウンドルール（研修のお約束）
+                            </h5>
+                            <ul class="text-xs text-[#7a6452] font-bold list-disc pl-5 space-y-1">
+                                <li>「これダメ、こうすべき」といった批判やアドバイスを、今日は一度おやすみしましょう。</li>
+                                <li>みんなの「たいせつにしたい想い」と「ちいさな一歩」を応援し合いましょう。</li>
+                                <li>ニックネームや匿名で、肩書をはずしてフラットに語りましょう。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 2: INPUT 1 (MIND) -->
+                    <div id="slide-1" class="slide-card hidden space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-5xl">🍓</div>
+                            <div>
+                                <h4 class="text-lg sm:text-2xl font-black text-[#5c4a3c] leading-tight">
+                                    教育相談で、いちばん「たいせつにしたい姿勢」とは？
+                                </h4>
+                                <p class="text-sm text-[#7a6452] font-bold mt-2 leading-relaxed">
+                                    教育相談において、テクニックよりも大切なのは、子どもや保護者に対する「基本のマインド（姿勢）」です。<br>
+                                    まずは次の4つのマインドを意識してみましょう。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
+                            <div class="bg-[#fff0f0] border-2 border-[#ffccd5] p-3 rounded-2xl text-center">
+                                <span class="text-xl">🎧</span>
+                                <h5 class="font-black text-xs text-[#d66870] mt-1">傾聴・共感</h5>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">答えをいそがず、うなずきながら最後まで話を聴く。</p>
+                            </div>
+                            <div class="bg-[#fffcf0] border-2 border-[#ffdac1] p-3 rounded-2xl text-center">
+                                <span class="text-xl">🌱</span>
+                                <h5 class="font-black text-xs text-[#e0a96d] mt-1">受容・見守り</h5>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">どんな感情も「そうんだね」とまるごと受け止める。</p>
+                            </div>
+                            <div class="bg-[#f0fafc] border-2 border-[#c7ecee] p-3 rounded-2xl text-center">
+                                <span class="text-xl">🤝</span>
+                                <h5 class="font-black text-xs text-[#3c8da6] mt-1">チーム連携</h5>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">担任だけで抱えず、職員室みんなのチームで支える。</p>
+                            </div>
+                            <div class="bg-[#f4fbf0] border-2 border-[#e2f0cb] p-3 rounded-2xl text-center">
+                                <span class="text-xl">🔍</span>
+                                <h5 class="font-black text-xs text-[#7ca852] mt-1">早期発見</h5>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">普段の会話や表情から、小さな変化にやさしく気づく。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: WORK 1 (WRITE MIND) -->
+                    <div id="slide-2" class="slide-card hidden space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-5xl">✏️</div>
+                            <div>
+                                <h4 class="text-lg sm:text-2xl font-black text-[#5c4a3c] leading-tight">
+                                    【ワーク1】あなたの大切にしたいマインドを表明しよう
+                                </h4>
+                                <p class="text-sm text-[#7a6452] font-bold mt-2 leading-relaxed">
+                                    子どもたちや保護者と向き合うとき、あなたが「これだけは忘れたくない」「大切にしている」姿勢を教えてください。<br>
+                                    スマートフォンのカメラで提示されたQRコードからアクセスし、ふせんに書いてボードに貼り付けましょう！
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-[#faf4eb] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+                            <div class="text-xs text-[#7a6452] font-bold">
+                                <p class="font-black text-sm text-[#b36214]">💡 投稿が終わったら...：</p>
+                                <p class="mt-1">他人のふせんをたくさん読んで、心に響いたものに「すてき！ 💞」をたくさんクリックしてください。</p>
+                            </div>
+                            <button onclick="switchTab('session1')" class="bouncy-btn bg-[#ffb7b2] hover:bg-[#ff9aa2] text-white text-xs font-black px-5 py-3 rounded-full flex items-center space-x-2 border-2 border-white shadow-sm">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>ワーク1「マインドボード」を開く</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 4: INPUT & WORK 2 (ACTION) -->
+                    <div id="slide-3" class="slide-card hidden space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-5xl">🍈</div>
+                            <div>
+                                <h4 class="text-lg sm:text-2xl font-black text-[#5c4a3c] leading-tight">
+                                    【ワーク2】明日から、学校現場で踏み出す「ちいさな一歩」
+                                </h4>
+                                <p class="text-sm text-[#7a6452] font-bold mt-2 leading-relaxed">
+                                    研修を「いい話を聞いた」で終わらせないために、明日からすぐに実践できる極小の行動を宣言します。<br>
+                                    大げさなものじゃなくて大丈夫。「朝、いつもより長く目を合わせて挨拶する」「面談の椅子を斜めにする」など、<b>120%確実に実行できるちいさな一歩</b>をボードに貼りましょう！
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-[#faf4eb] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+                            <div class="text-xs text-[#7a6452] font-bold">
+                                <p class="font-black text-sm text-[#2c7a5f]">💡 アクション分類 5つの視点：</p>
+                                <p class="mt-1">「子どもへの関わり」「環境・場づくり」「職員室での連携」「先生のセルフケア」「その他」から選べます。</p>
+                            </div>
+                            <button onclick="switchTab('session2')" class="bouncy-btn bg-[#77cca4] hover:bg-[#5bba8f] text-white text-xs font-black px-5 py-3 rounded-full flex items-center space-x-2 border-2 border-white shadow-sm">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>ワーク2「明日の一歩ボード」を開く</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 5: CONCLUSION -->
+                    <div id="slide-4" class="slide-card hidden space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-5xl">🌈</div>
+                            <div>
+                                <h4 class="text-lg sm:text-2xl font-black text-[#5c4a3c] leading-tight">
+                                    あたたかいマインドを重ね、あしたからの現場へ！
+                                </h4>
+                                <p class="text-sm text-[#7a6452] font-bold mt-2 leading-relaxed">
+                                    これで本日のワークは終了です。みなさんの心にどんなマインドやアクションが集まったでしょうか？<br>
+                                    「あつまった記録・分析」タブから、全体の傾向をグラフで振り返りましょう。今日みんなで誓い合った「ちいさな一歩」が、学校全体を優しく変える種になります。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <button onclick="switchTab('dashboard')" class="bouncy-btn bg-[#e2f0cb] text-[#5c4a3c] hover:bg-[#d5e7b8] text-xs font-black px-6 py-3.5 rounded-full flex items-center space-x-2 border-2 border-[#c4db9f] shadow-md">
+                                <i class="fa-solid fa-chart-pie"></i>
+                                <span>あつまった記録・統計グラフをみる 📊</span>
+                            </button>
+                            <button onclick="copyToClipboardTSV()" class="bouncy-btn bg-white border-2 border-[#ebd8c5] hover:bg-[#faf4eb] text-[#7a6452] text-xs font-black px-6 py-3.5 rounded-full flex items-center space-x-2 shadow-md">
+                                <i class="fa-solid fa-copy"></i>
+                                <span>本日の記録をクリップボードに一括コピー 📋</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SLIDE NAVIGATION BUTTONS -->
+                <div class="flex justify-between items-center pt-4 border-t-2 border-[#faf4eb]">
+                    <button id="prevSlideBtn" onclick="prevSlide()" class="bouncy-btn bg-[#f5ebe0] hover:bg-[#e3d5ca] text-[#7a6452] text-xs font-black px-5 py-2.5 rounded-full shadow-sm flex items-center space-x-1.5 opacity-50 cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>前へ</span>
+                    </button>
+                    
+                    <!-- Trainer Guide Toggle Button -->
+                    <button onclick="toggleTrainerScript()" class="bouncy-btn bg-[#ffeedd] border-2 border-[#ffd0a5] hover:bg-[#ffe3c7] text-[#a66e38] text-xs font-black px-4 py-2.5 rounded-full flex items-center space-x-1.5 shadow-sm">
+                        <i class="fa-solid fa-microphone"></i>
+                        <span>ファシリテーターの進行台本 (セリフ)</span>
+                        <span id="scriptToggleIcon"><i class="fa-solid fa-chevron-down text-[10px]"></i></span>
+                    </button>
+
+                    <button id="nextSlideBtn" onclick="nextSlide()" class="bouncy-btn bg-[#ffb7b2] hover:bg-[#ff9aa2] text-white text-xs font-black px-5 py-2.5 rounded-full shadow-sm flex items-center space-x-1.5">
+                        <span>次へ</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- FACILITATOR SPEAKER SCRIPTS (COLLAPSED BY DEFAULT) -->
+                <div id="trainerScriptArea" class="hidden bg-[#fff9f2] border-4 border-[#ffebd6] rounded-2xl p-5 text-xs text-[#735c4b] font-bold space-y-3 relative">
+                    <div class="absolute right-4 top-4 text-[#ffd0a5] text-2xl"><i class="fa-solid fa-comment-dots"></i></div>
+                    <span class="bg-[#ffd0a5] text-[#b36214] text-[10px] font-black px-2.5 py-1 rounded-full uppercase">ファシリテーター用進行台本 🎤</span>
+                    <div id="scriptContent" class="leading-relaxed whitespace-pre-line mt-2">
+                        <!-- Dynamic speaker notes injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: SESSION 1 (MIND BOARD) ==================== -->
+        <section id="content-session1" class="tab-content hidden space-y-6">
+            <!-- Session Banner & Prompt -->
+            <div class="bg-[#fff0f0] border-4 border-[#ffccd5] rounded-[2rem] p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2 text-[#e57c82] font-black text-lg">
+                        <i class="fa-solid fa-heart animate-pulse"></i>
+                        <span>みんなの心をつなぐ「大切にしたいマインド」</span>
+                    </div>
+                    <p class="text-[#8c5255] text-sm mt-1 font-bold">
+                        子どもたちや保護者の話を聴くとき、一番たいせつにしたい基本の姿勢を教えてください。
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="openPresenterMode('session1')" class="bouncy-btn bg-[#ffb7b2] hover:bg-[#ff9aa2] text-white font-black text-xs px-5 py-3 rounded-full transition-all shadow-md flex items-center space-x-1.5 border-2 border-white">
+                        <i class="fa-solid fa-expand"></i>
+                        <span>プロジェクター投影 📺</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Split Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Submit Form (Left Side) -->
+                <div class="lg:col-span-1 bg-white border-4 border-[#ffccd5] rounded-[2rem] p-6 shadow-sm h-fit lg:sticky lg:top-36">
+                    <h3 class="font-black text-[#5c4a3c] mb-4 pb-2 border-b-2 border-[#fff0f0] flex items-center space-x-2">
+                        <i class="fa-solid fa-pen-fancy text-[#ff8b94]"></i>
+                        <span>マインドをかきこむ ✏️</span>
+                    </h3>
+                    <form id="mindForm" onsubmit="submitMind(event)" class="space-y-4 font-bold">
+                        <!-- Category Picker -->
+                        <div>
+                            <label class="block text-xs font-black text-[#8c5255] uppercase mb-2">姿勢のカテゴリ 🍓</label>
+                            <select id="mindCategory" class="w-full bg-[#fffcfc] border-2 border-[#ffccd5] text-[#735c4b] rounded-full p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#ffb7b2] font-black" required>
+                                <option value="傾聴・共感" selected>🎧 寄り添って聴く（傾聴・共感）</option>
+                                <option value="受容・見守り">🌱 まるごと受け止める（受容・肯定）</option>
+                                <option value="チーム・組織対応">🤝 みんなでつなぐ（職員室・チーム連携）</option>
+                                <option value="早期発見・予防">🔍 やさしく気づく（早期発見・見守り）</option>
+                                <option value="その他">💡 その他（アイデアなど）</option>
+                            </select>
+                        </div>
+                        <!-- Content input -->
+                        <div>
+                            <label class="block text-xs font-black text-[#8c5255] uppercase mb-2">伝えたいマインド（60字以内） 💌</label>
+                            <textarea id="mindText" rows="3" maxlength="60" placeholder="例：アドバイスをすぐに言いたくなる気持ちをちょっとだけおさえて、うなずきながら聴く。🍄" class="w-full bg-[#fffcfc] border-2 border-[#ffccd5] rounded-3xl p-4 text-sm text-[#5c4a3c] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ffb7b2] resize-none" required></textarea>
+                        </div>
+                        <!-- Poster Name (Optional) -->
+                        <div>
+                            <label class="block text-xs font-black text-[#8c5255] uppercase mb-2">なまえ（お好きなニックネームや匿名でOK） 🐣</label>
+                            <input type="text" id="mindAuthor" placeholder="例：うさぎ先生 / 匿名" class="w-full bg-[#fffcfc] border-2 border-[#ffccd5] rounded-full p-3 text-sm text-[#5c4a3c] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ffb7b2]">
+                        </div>
+                        <button type="submit" class="bouncy-btn w-full bg-[#ffb7b2] hover:bg-[#ff9aa2] text-white font-black py-4 px-4 rounded-full shadow-md transition-all flex items-center justify-center space-x-2 border-2 border-white">
+                            <i class="fa-solid fa-paper-plane animate-pulse"></i>
+                            <span>ボードにはりつける！🎈</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Sticky Notes Grid Board (Right Side) -->
+                <div class="lg:col-span-3 space-y-4">
+                    <!-- Filter and Stats Bar -->
+                    <div class="bg-white border-4 border-[#ffccd5] rounded-[2rem] p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                        <!-- Filters -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-black text-[#c0a894] uppercase">えらぶ:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="filterMindBoard('All')" id="filter-mind-All" class="filter-mind-btn active bouncy-btn px-4 py-1.5 bg-[#fff0f0] text-[#ff8b94] text-xs font-black rounded-full shadow-sm border-2 border-[#ffccd5] transition-all">
+                                    すべて 🌻 (<span id="count-mind-all">0</span>)
+                                </button>
+                                <button onclick="filterMindBoard('傾聴・共感')" id="filter-mind-傾聴・共感" class="filter-mind-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#fff0f0] text-xs font-black rounded-full transition-all">
+                                    🎧 傾聴 (<span id="count-mind-listen">0</span>)
+                                </button>
+                                <button onclick="filterMindBoard('受容・見守り')" id="filter-mind-受容・見守り" class="filter-mind-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#fff0f0] text-xs font-black rounded-full transition-all">
+                                    🌱 受容 (<span id="count-mind-accept">0</span>)
+                                </button>
+                                <button onclick="filterMindBoard('チーム・組織対応')" id="filter-mind-チーム・組織対応" class="filter-mind-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#fff0f0] text-xs font-black rounded-full transition-all">
+                                    🤝 連携 (<span id="count-mind-team">0</span>)
+                                </button>
+                                <button onclick="filterMindBoard('早期発見・予防')" id="filter-mind-早期発見・予防" class="filter-mind-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#fff0f0] text-xs font-black rounded-full transition-all">
+                                    🔍 気づき (<span id="count-mind-early">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sort option -->
+                        <div class="flex items-center space-x-2">
+                            <label for="mindSort" class="text-xs font-black text-[#c0a894]">ならびかえ:</label>
+                            <select id="mindSort" onchange="renderMindBoard()" class="bg-[#faf4eb] border-none text-xs font-black text-[#7a6452] rounded-full py-2 px-3 focus:outline-none">
+                                <option value="newest">新しい順 🕰️</option>
+                                <option value="likes">共感が多い順 💞</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sticky notes grid -->
+                    <div id="mindNotesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Dynamic Notes Inserted Here -->
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="mindEmptyState" class="hidden bg-white border-4 border-dashed border-[#ffccd5] rounded-[2rem] p-12 text-center text-[#c0a894]">
+                        <i class="fa-solid fa-cookie-bite text-5xl mb-3 text-[#ffccd5] animate-bounce"></i>
+                        <p class="font-black">まだマインドの投稿はありません ☕</p>
+                        <p class="text-xs mt-1 font-bold" id="mindEmptyHint">最初のふせんをはってみましょう！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: SESSION 2 (ACTION BOARD) ==================== -->
+        <section id="content-session2" class="tab-content hidden space-y-6">
+            <!-- Session Banner & Prompt -->
+            <div class="bg-[#eafaf4] border-4 border-[#b5ead7] rounded-[2rem] p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2 text-[#2c7a5f] font-black text-lg">
+                        <i class="fa-solid fa-shoe-prints animate-bounce"></i>
+                        <span>あしたから現場ではじめる「ちいさな一歩」🐾</span>
+                    </div>
+                    <p class="text-[#3b6054] text-sm mt-1 font-bold">
+                        今日からあしたへとつなぐ、あなたが「これなら確実にできる！」という極小のアクションを教えてください。
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="openPresenterMode('session2')" class="bouncy-btn bg-[#77cca4] hover:bg-[#5bba8f] text-white font-black text-xs px-5 py-3 rounded-full transition-all shadow-md flex items-center space-x-1.5 border-2 border-white">
+                        <i class="fa-solid fa-expand"></i>
+                        <span>プロジェクター投影 📺</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Split Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Submit Form (Left Side) -->
+                <div class="lg:col-span-1 bg-white border-4 border-[#b5ead7] rounded-[2rem] p-6 shadow-sm h-fit lg:sticky lg:top-36">
+                    <h3 class="font-black text-[#5c4a3c] mb-4 pb-2 border-b-2 border-[#eafaf4] flex items-center space-x-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-[#77cca4]"></i>
+                        <span>あしたへの決意 🌻</span>
+                    </h3>
+                    <form id="actionForm" onsubmit="submitAction(event)" class="space-y-4 font-bold">
+                        <!-- Category Picker -->
+                        <div>
+                            <label class="block text-xs font-black text-[#2c7a5f] uppercase mb-2">アクション分類 🍈</label>
+                            <select id="actionCategory" class="w-full bg-[#fcfdfd] border-2 border-[#b5ead7] text-[#735c4b] rounded-full p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#77cca4] font-black" required>
+                                <option value="子どもへの関わり" selected>💬 こどもへの温かい声かけ・表情</option>
+                                <option value="環境・場づくり">🏫 ほっとする環境づくり・面談室</option>
+                                <option value="同僚・連携・情報共有">📣 職員室でのわかちあい・すぐ報告</option>
+                                <option value="心のセルフケア">🔋 先生の心が元気になるおまじない</option>
+                                <option value="その他">💡 その他</option>
+                            </select>
+                        </div>
+                        <!-- Content input -->
+                        <div>
+                            <label class="block text-xs font-black text-[#2c7a5f] uppercase mb-2">ちいさな一歩（60字以内） ⭐</label>
+                            <textarea id="actionText" rows="3" maxlength="60" placeholder="例：あした朝、いつも俯きがちなAくんに目線をあわせて『よく来たね！』と伝える。🌱" class="w-full bg-[#fcfdfd] border-2 border-[#b5ead7] rounded-3xl p-4 text-sm text-[#5c4a3c] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#77cca4] resize-none" required></textarea>
+                        </div>
+                        <!-- Poster Name (Optional) -->
+                        <div>
+                            <label class="block text-xs font-black text-[#2c7a5f] uppercase mb-2">なまえ（お好きなニックネームや匿名でOK） 🎨</label>
+                            <input type="text" id="actionAuthor" placeholder="例：ひよこ先生 / 匿名" class="w-full bg-[#fcfdfd] border-2 border-[#b5ead7] rounded-full p-3 text-sm text-[#5c4a3c] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#77cca4]">
+                        </div>
+                        <button type="submit" class="bouncy-btn w-full bg-[#77cca4] hover:bg-[#5bba8f] text-white font-black py-4 px-4 rounded-full shadow-md transition-all flex items-center justify-center space-x-2 border-2 border-white">
+                            <i class="fa-solid fa-paper-plane animate-pulse"></i>
+                            <span>ボードにはりつける！🌱</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Action Grid Board (Right Side) -->
+                <div class="lg:col-span-3 space-y-4">
+                    <!-- Filter and Stats Bar -->
+                    <div class="bg-white border-4 border-[#b5ead7] rounded-[2rem] p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                        <!-- Filters -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-black text-[#c0a894] uppercase">えらぶ:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="filterActionBoard('All')" id="filter-action-All" class="filter-action-btn active bouncy-btn px-4 py-1.5 bg-[#eafaf4] text-[#2c7a5f] text-xs font-black rounded-full shadow-sm border-2 border-[#b5ead7] transition-all">
+                                    すべて 🧸 (<span id="count-action-all">0</span>)
+                                </button>
+                                <button onclick="filterActionBoard('子どもへの関わり')" id="filter-action-子どもへの関わり" class="filter-action-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#eafaf4] text-xs font-black rounded-full transition-all">
+                                    💬 子ども (<span id="count-action-child">0</span>)
+                                </button>
+                                <button onclick="filterActionBoard('環境・場づくり')" id="filter-action-環境・場づくり" class="filter-action-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#eafaf4] text-xs font-black rounded-full transition-all">
+                                    🏫 環境 (<span id="count-action-env">0</span>)
+                                </button>
+                                <button onclick="filterActionBoard('同僚・連携・情報共有')" id="filter-action-同僚・連携・情報共有" class="filter-action-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#eafaf4] text-xs font-black rounded-full transition-all">
+                                    📣 職員室 (<span id="count-action-team">0</span>)
+                                </button>
+                                <button onclick="filterActionBoard('心のセルフケア')" id="filter-action-心のセルフケア" class="filter-action-btn bouncy-btn px-4 py-1.5 text-[#7a6452] hover:bg-[#eafaf4] text-xs font-black rounded-full transition-all">
+                                    🔋 ケア (<span id="count-action-care">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sort option -->
+                        <div class="flex items-center space-x-2">
+                            <label for="actionSort" class="text-xs font-black text-[#c0a894]">ならびかえ:</label>
+                            <select id="actionSort" onchange="renderActionBoard()" class="bg-[#faf4eb] border-none text-xs font-black text-[#7a6452] rounded-full py-2 px-3 focus:outline-none">
+                                <option value="newest">新しい順 🕰️</option>
+                                <option value="likes">共感が多い順 💖</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sticky notes grid -->
+                    <div id="actionNotesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Dynamic Notes Inserted Here -->
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="actionEmptyState" class="hidden bg-white border-4 border-dashed border-[#b5ead7] rounded-[2rem] p-12 text-center text-[#c0a894]">
+                        <i class="fa-solid fa-seedling text-5xl mb-3 text-[#b5ead7] animate-bounce"></i>
+                        <p class="font-black">まだアクションプランの投稿はありません 🌱</p>
+                        <p class="text-xs mt-1 font-bold" id="actionEmptyHint">最後のアクションを宣言してみましょう！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: DASHBOARD & EXPORT ==================== -->
+        <section id="content-dashboard" class="tab-content hidden space-y-6">
+            <!-- Analytics Summary Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold">
+                <!-- Session 1 stats card -->
+                <div class="bg-white border-4 border-[#ffccd5] rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
+                    <div class="absolute right-3 top-3 text-3xl opacity-20">🍓</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-black text-[#8c5255]">前半「たいせつなマインド」</span>
+                        <span class="text-[#ff8b94] bg-[#fff0f0] text-xs font-black px-3 py-1 rounded-full border border-[#ffccd5]">おもい</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="mindCount" class="text-4xl font-black text-[#d66870]">0</span>
+                        <span class="text-[#735c4b] text-sm">枚のふせん</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 font-medium">受講生の皆さんが一番大切にしたい想いの数です。</p>
+                </div>
+
+                <!-- Session 2 stats card -->
+                <div class="bg-white border-4 border-[#b5ead7] rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
+                    <div class="absolute right-3 top-3 text-3xl opacity-20">🌱</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-black text-[#2c7a5f]">後半「明日からの一歩」</span>
+                        <span class="text-[#2c7a5f] bg-[#eafaf4] text-xs font-black px-3 py-1 rounded-full border border-[#b5ead7]">アクション</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="actionCount" class="text-4xl font-black text-[#2a9d8f]">0</span>
+                        <span class="text-[#735c4b] text-sm">個のせんげん</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 font-medium">明日学校でやってみる具体的なアイデアの数です。</p>
+                </div>
+
+                <!-- Collaboration index stats card -->
+                <div class="bg-white border-4 border-[#ffebd6] rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
+                    <div class="absolute right-3 top-3 text-3xl opacity-20">🎁</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-black text-[#a66e38]">研修全体のわくわく度</span>
+                        <span class="text-[#b36214] bg-[#ffeedd] text-xs font-black px-3 py-1 rounded-full border border-[#ffd0a5]">つながり</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="totalInteractionCount" class="text-4xl font-black text-[#b36214]">0</span>
+                        <span class="text-[#735c4b] text-sm">回の共感 💖</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 font-medium">「すてき！」「わかる！」をお互いに応援しあった合計です。</p>
+                </div>
+            </div>
+
+            <!-- Visualization Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Mind Categories -->
+                <div class="bg-white border-4 border-[#ffccd5] rounded-[2rem] p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-black text-[#5c4a3c] text-base mb-1">🍭 心にそだてるマインドの分布</h4>
+                        <p class="text-xs text-gray-400 mb-4 font-bold">先生たちがどの基本姿勢を大切にしているかをグラフ化しました</p>
+                    </div>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="mindChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Action Categories -->
+                <div class="bg-white border-4 border-[#b5ead7] rounded-[2rem] p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-black text-[#5c4a3c] text-base mb-1">🧩 明日からのアクションシーン分類</h4>
+                        <p class="text-xs text-gray-400 mb-4 font-bold">明日どこで一歩を踏み出すかのバランスグラフです</p>
+                    </div>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="actionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORGANIZER UNIQUE: ACTIVE PARTICIPANTS TRACKER (VISIBLE TO ADMIN) -->
+            <div id="adminTrackerSection" class="hidden bg-white border-4 border-emerald-300 rounded-[2rem] p-6 shadow-md space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-emerald-100 pb-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-black">主催者用機能</span>
+                            <h3 class="font-black text-[#5c4a3c] text-lg flex items-center space-x-1.5">
+                                <i class="fa-solid fa-user-gear text-emerald-600"></i>
+                                <span>受講者アクティビティ・データトラッカー</span>
+                            </h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 font-bold">研修に参加している受講生（ブラウザ端末）別の回答・送信状況と貢献度をリアルタイムに収集しています。</p>
+                    </div>
+                    <button onclick="downloadParticipantReport()" class="bouncy-btn bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-2.5 rounded-full flex items-center space-x-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>受講者活動一覧(CSV)を保存 📥</span>
+                    </button>
+                </div>
+
+                <!-- Active Participants Table -->
+                <div class="border-2 border-emerald-100 rounded-2xl overflow-hidden max-h-72 overflow-y-auto">
+                    <table class="min-w-full divide-y divide-emerald-100 text-xs text-left">
+                        <thead class="bg-emerald-50 text-emerald-900 font-black sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3">受講者 匿名ID</th>
+                                <th class="px-4 py-3">設定したお名前</th>
+                                <th class="px-4 py-3 text-center">ワーク1 🍓 投稿数</th>
+                                <th class="px-4 py-3 text-center">ワーク2 🍈 投稿数</th>
+                                <th class="px-4 py-3 text-center">獲得した総共感数 💖</th>
+                                <th class="px-4 py-3 text-center">アクティビティ状態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantTableBody" class="divide-y divide-gray-100 bg-white text-[#735c4b] font-medium">
+                            <!-- Dynamic rows via js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EXPORT & SPREADSHEET COPY AREA -->
+            <div class="bg-white border-4 border-[#ebd8c5] rounded-[2rem] p-6 shadow-sm space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b-2 border-[#faf4eb]">
+                    <div>
+                        <h3 class="font-black text-[#5c4a3c] text-lg flex items-center space-x-2">
+                            <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                            <span>スプレッドシート・Excelへのデータ引越し 🍯</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1 font-bold">研修の成果を、スプレッドシート等に直接貼り付け（コピペ）したり、CSVファイルで保存したりできます。</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="copyToClipboardTSV()" class="bouncy-btn bg-[#ffeedd] border-2 border-[#ffd0a5] hover:bg-[#ffe3c7] text-[#a66e38] font-black text-xs px-4 py-2.5 rounded-full shadow-sm transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Excel・スプレッドシートにコピペ用データをコピー 📋</span>
+                        </button>
+                        <button onclick="downloadCSV('session1')" class="bouncy-btn bg-[#fff0f0] border-2 border-[#ffccd5] hover:bg-[#ffe3e3] text-[#e57c82] font-black text-xs px-4 py-2.5 rounded-full transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-download"></i>
+                            <span>マインド(CSV)を保存 🍓</span>
+                        </button>
+                        <button onclick="downloadCSV('session2')" class="bouncy-btn bg-[#eafaf4] border-2 border-[#b5ead7] hover:bg-[#cbf7e6] text-[#2c7a5f] font-black text-xs px-4 py-2.5 rounded-full transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-download"></i>
+                            <span>明日の一歩(CSV)を保存 🍈</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Raw Data Preview Tables -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 font-bold">
+                    <!-- Session 1 table preview -->
+                    <div class="space-y-2">
+                        <h4 class="font-black text-[#5c4a3c] text-sm flex items-center space-x-2">
+                            <span class="bg-[#fff0f0] text-[#e57c82] text-xs px-2.5 py-1 rounded-full border border-[#ffccd5]">1</span>
+                            <span>マインド集約シート プレビュー 👀</span>
+                        </h4>
+                        <div class="border-2 border-[#ebd8c5] rounded-2xl overflow-hidden max-h-60 overflow-y-auto">
+                            <table class="min-w-full divide-y-2 divide-[#ebd8c5] text-xs text-left">
+                                <thead class="bg-[#faf4eb] text-[#7a6452] font-black sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3">カテゴリ</th>
+                                        <th class="px-4 py-3">内容</th>
+                                        <th class="px-4 py-3">投稿者</th>
+                                        <th class="px-4 py-3">すてき！</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mindTableBody" class="divide-y divide-[#faf4eb] bg-white text-[#735c4b]">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Session 2 table preview -->
+                    <div class="space-y-2">
+                        <h4 class="font-black text-[#5c4a3c] text-sm flex items-center space-x-2">
+                            <span class="bg-[#eafaf4] text-[#2c7a5f] text-xs px-2.5 py-1 rounded-full border border-[#b5ead7]">2</span>
+                            <span>明日の一歩シート プレビュー 👀</span>
+                        </h4>
+                        <div class="border-2 border-[#ebd8c5] rounded-2xl overflow-hidden max-h-60 overflow-y-auto">
+                            <table class="min-w-full divide-y-2 divide-[#ebd8c5] text-xs text-left">
+                                <thead class="bg-[#faf4eb] text-[#7a6452] font-black sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3">カテゴリ</th>
+                                        <th class="px-4 py-3">内容</th>
+                                        <th class="px-4 py-3">投稿者</th>
+                                        <th class="px-4 py-3">わかる！</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="actionTableBody" class="divide-y divide-[#faf4eb] bg-white text-[#735c4b]">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database operations (Only visible/actionable for Admin) -->
+                <div id="adminResetArea" class="hidden bg-[#fff2f2] border-4 border-[#ffccd5] rounded-3xl p-5 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-black text-[#b85a5f] text-sm">データのすべてもとどおりにする（研修管理者向け）</h4>
+                        <p class="text-xs text-[#a87a7c] mt-1">次の新しい研修のために、現在の投稿データを完全にまっさらな状態に戻します。</p>
+                    </div>
+                    <button onclick="clearAllData()" class="bouncy-btn bg-[#ff9aa2] border-2 border-white hover:bg-[#ff8b94] text-white font-black text-xs px-5 py-3 rounded-full transition-colors shadow-sm">
+                        みんなの意見をリセット 🧹
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: FACILITATOR GUIDE ==================== -->
+        <section id="content-guide" class="tab-content hidden space-y-6">
+            <div class="bg-white border-4 border-[#ffdac1] rounded-[2.5rem] p-6 sm:p-8 shadow-sm space-y-8">
+                <!-- Guide Header -->
+                <div class="border-b-4 border-[#ffdac1] pb-4">
+                    <h2 class="text-xl sm:text-2xl font-black text-[#5c4a3c] flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-[#ffb7b2]"></i>
+                        <span>主催者のための「教育相談研修」虎の巻（指導計画）</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">校内研修 or 校務部会でこのツールを使って研修を成功させるための実践マニュアルです。</p>
+                </div>
+
+                <!-- Program Design Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold">
+                    <div class="bg-[#fffbf0] border-2 border-[#ffdac1] p-5 rounded-2xl">
+                        <span class="text-lg">⏱️ 研修所要時間</span>
+                        <p class="text-base text-[#b36214] mt-1">約 30分 〜 50分</p>
+                        <p class="text-[10px] text-gray-500 font-normal mt-1">短時間での凝縮実施から、グループ対話を重視したじっくりワークまで時間調整が可能です。</p>
+                    </div>
+                    <div class="bg-[#fff0f0] border-2 border-[#ffccd5] p-5 rounded-2xl">
+                        <span class="text-lg">🎯 研修のゴール</span>
+                        <p class="text-sm text-[#e57c82] mt-1">1. 基本マインドの共通理解</p>
+                        <p class="text-sm text-[#e57c82]">2. 明日からの一歩の具体化</p>
+                        <p class="text-[10px] text-gray-500 font-normal mt-1">「明日からこれならできる」というアクションを教職員同士が応援しあう雰囲気を醸成します。</p>
+                    </div>
+                    <div class="bg-[#eafaf4] border-2 border-[#b5ead7] p-5 rounded-2xl">
+                        <span class="text-lg">💻 推奨機材環境</span>
+                        <p class="text-xs text-emerald-800 mt-1">・大型モニター or プロジェクター</p>
+                        <p class="text-xs text-emerald-800">・ファシリテーター用PC 1台</p>
+                        <p class="text-xs text-emerald-800">・受講者端末（スマホやタブレット等）</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PRESENTER FULLSCREEN MODAL (PROJECTOR MODE) -->
+    <div id="presenterModal" class="fixed inset-0 bg-[#3a2c22] z-50 hidden flex flex-col p-8 overflow-hidden">
+        <!-- Presenter Header -->
+        <div class="flex justify-between items-center border-b-4 border-[#523e30] pb-5 mb-6">
+            <div class="flex items-center space-x-3 text-white">
+                <span id="presenterBadge" class="bg-[#ffb7b2] text-white text-xs px-4 py-2 rounded-full font-black border-2 border-white">おもい集約</span>
+                <h2 id="presenterTitle" class="text-xl sm:text-3xl font-black text-[#fff4e0]">みんなの大切にしたいマインドセット一覧 🌱</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-[#ffe0b2] text-xs font-black flex items-center space-x-1.5 bg-[#523e30] border-2 border-[#ffccd5]/20 px-4 py-2 rounded-full">
+                    <span class="flex h-2.5 w-2.5 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span>リアルタイムに声を集計中...</span>
+                </span>
+                <button onclick="closePresenterMode()" class="bouncy-btn bg-[#523e30] hover:bg-[#735c4b] text-[#ffd6a5] rounded-full p-3 transition-colors border-2 border-white/20">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Presenter Sticky Note Container (Scrollable Grid) -->
+        <div id="presenterGrid" class="flex-grow overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-2">
+            <!-- Projector cards inserted here -->
+        </div>
+
+        <!-- Presenter Footer info -->
+        <div class="mt-6 pt-4 border-t-4 border-[#523e30] flex justify-between items-center text-[#ffebd6] text-xs font-black">
+            <div>🎈 教育相談研修・あたたかい学び of 受講生の記録（共感があつまった意見は、輝きます）</div>
+            <div>ぜんぶで <span id="presenterCount" class="font-black text-lg text-[#ffd6a5]">0</span> 件のおはなし</div>
+        </div>
+    </div>
+
+    <!-- CUTE PASSWORD / ADMIN LOGIN MODAL -->
+    <div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white border-4 border-[#ebd8c5] rounded-[2.5rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative text-[#5c4a3c] font-bold">
+            <!-- Close button -->
+            <button onclick="closeAdminModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="text-center space-y-4">
+                <div class="bg-[#ffeedd] text-[#e67e22] w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-2xl mx-auto shadow-md">
+                    <i class="fa-solid fa-user-shield" id="adminModalIcon"></i>
+                </div>
+                <h3 class="text-xl font-black" id="adminModalTitle">主催者パスワード設定</h3>
+                <p class="text-xs text-[#a68d77]" id="adminModalDesc">このブラウザで研修スライドや虎の巻機能、一括リセットを管理するための主催者パスワードを設定してください。</p>
+                
+                <form onsubmit="submitAdminPassword(event)" class="space-y-4 text-left">
+                    <div>
+                        <label for="adminPassInput" class="block text-xs font-black text-[#a68d77] uppercase mb-2">パスワードを入力してください 🔑</label>
+                        <input type="password" id="adminPassInput" placeholder="4文字以上のパスワード（例: admin）" class="w-full bg-[#faf4eb] border-2 border-[#ebd8c5] rounded-full p-3 text-center text-sm focus:outline-none focus:ring-2 focus:ring-[#ffd8b3] font-black" required minlength="4">
+                    </div>
+                    <button type="submit" class="bouncy-btn w-full bg-[#ffd8b3] hover:bg-[#ffc68c] text-[#7e5109] font-black py-3.5 px-4 rounded-full shadow-md transition-all flex items-center justify-center space-x-2 border-2 border-white" id="adminModalBtn">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="adminModalBtnText">ロック解除 🔓</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JOIN QR CODE MODAL FOR FACILITATION -->
+    <div id="qrModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white border-4 border-[#ffb7b2] rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl relative text-center text-[#5c4a3c] font-bold">
+            <button onclick="closeQrModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="bg-[#ffe5e5] text-[#ff8b94] w-14 h-14 rounded-2xl flex items-center justify-center text-xl mx-auto mb-4">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <h3 class="text-lg font-black mb-1">スマートフォンから参加 📱</h3>
+            <p class="text-xs text-[#a68d77] mb-4">プロジェクター画面に投影された下記のQRコードを受講生の端末カメラでスキャンして対話に参加します。</p>
+            
+            <div class="mb-5 text-left">
+                <label class="block text-[10px] font-black text-[#e57c82] uppercase mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-link"></i> <span>受講者用参加URLの確認・調整</span>
+                </label>
+                <input type="text" id="qrUrlInput" class="w-full bg-[#fffcf5] border-2 border-[#ffccd5] rounded-full px-4 py-2 text-xs text-[#5c4a3c] focus:outline-none focus:ring-2 focus:ring-[#ffb7b2] font-black" placeholder="https://..." oninput="handleUrlOverride(this.value)">
+                <p class="text-[9px] text-[#c0a894] mt-1.5 leading-relaxed font-bold">※ iframe等で読み込みURLが変わってしまった場合は、ここに本番の公開URLを直接貼り付けると、QRコードが切り替わります。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl border-2 border-[#ebd8c5] inline-block mb-4 shadow-inner">
+                <img id="modalQrImg" src="" alt="Dynamic QR Code" class="w-48 h-48 mx-auto">
+            </div>
+            <div class="text-xs text-gray-400 break-all font-medium select-all p-2 bg-[#fffcf5] border border-dashed rounded-xl" id="modalUrlText">
+                -
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SYSTEM -->
+    <div id="notificationToast" class="fixed bottom-6 right-6 z-50 bg-[#5c4a3c] text-white border-2 border-[#ebd8c5] px-6 py-4 rounded-[1.5rem] shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none font-black text-sm">
+        <i id="notifyIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="notifyText">メッセージが届きました！</span>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t-4 border-[#ebd8c5] py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[#a68d77] font-black flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div>&copy; 2026 教育相談研修 ほっこり意見あつめボード - クラウド同期型やさしい対話パッケージ 🌸</div>
+            <div class="flex items-center space-x-2 text-[10px] text-gray-400 font-medium">
+                <span>あなたの受講用ID:</span>
+                <span id="userIdBadge" class="bg-gray-100 px-2 py-1 rounded select-all font-mono">-</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FIREBASE AND SYSTEM APPLICATION LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL STATE ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'edu-cons-workshop-cute';
+        const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        const LS_ADMIN_PASS_KEY = 'edu_cons_workshop_admin_pass';
+        const LS_MIND_KEY = 'edu_cons_workshop_minds_fallback';
+        const LS_ACTION_KEY = 'edu_cons_workshop_actions_fallback';
+
+        let minds = [];
+        let actions = [];
+        let activeTab = 'session1'; 
+        let currentSlide = 0;
+        let mindFilter = 'All';
+        let actionFilter = 'All';
+        let activeUsers = 1;
+        let isAdmin = false; 
+        let pendingTabTarget = null; 
+        let myUserId = 'local-user-' + crypto.randomUUID().substring(0, 8);
+
+        let mindChartInstance = null;
+        let actionChartInstance = null;
+
+        // 全ての疑似蓄積投稿、ダミー投稿、お試しデータを完全消去して空にします
+        const presetMinds = [];
+        const presetActions = [];
+
+        // --- DYNAMIC DATA SYNC HYBRID ENGINE (FIRESTORE <-> LOCAL FALLBACK) ---
+        let firebaseConfig = null;
+        let isFirebaseActive = false;
+        let db = null;
+        let auth = null;
+
+        if (rawConfig) {
+            try {
+                firebaseConfig = JSON.parse(rawConfig);
+            } catch (e) {
+                console.warn("Could not parse config. Running in Local Mode.");
+            }
+        }
+
+        // Firebaseが利用可能かチェック
+        if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "dummy-api-key") {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                isFirebaseActive = true;
+                console.log("Firebase initialized successfully! Cloud-mode Active ☁️");
+            } catch (e) {
+                console.warn("Firebase initialization crashed. Falling back to Local Mode. ✨", e);
+                isFirebaseActive = false;
+            }
+        } else {
+            console.log("Firebase configuration is blank or dummy. Active Fallback Mode. ✨");
+        }
+
+        // --- INITIALIZATION ---
+        async function init() {
+            if (!localStorage.getItem(LS_MIND_KEY)) {
+                localStorage.setItem(LS_MIND_KEY, JSON.stringify(presetMinds));
+            }
+            if (!localStorage.getItem(LS_ACTION_KEY)) {
+                localStorage.setItem(LS_ACTION_KEY, JSON.stringify(presetActions));
+            }
+
+            minds = JSON.parse(localStorage.getItem(LS_MIND_KEY));
+            actions = JSON.parse(localStorage.getItem(LS_ACTION_KEY));
+
+            // Firebase認証
+            if (isFirebaseActive) {
+                try {
+                    const customToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (customToken) {
+                        await signInWithCustomToken(auth, customToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (err) {
+                    console.error("Firebase auth failed, falling back to local simulation:", err);
+                    isFirebaseActive = false;
+                }
+
+                if (isFirebaseActive) {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            myUserId = user.uid;
+                            document.getElementById('userIdBadge').innerText = myUserId;
+                            setupFirestoreListeners();
+                        }
+                    });
+                }
+            }
+
+            if (!isFirebaseActive) {
+                document.getElementById('userIdBadge').innerText = myUserId + " (ローカル)";
+                renderMindBoard();
+                renderActionBoard();
+            }
+
+            // QRコードなどの生成
+            const savedQrUrl = localStorage.getItem('edu_cons_workshop_qr_url');
+            const targetUrl = savedQrUrl || window.location.href;
+            document.getElementById('qrUrlInput').value = targetUrl;
+            updateQrElements(targetUrl);
+
+            // スライド・UIの表示更新
+            updateSlideView();
+            updateAdminUI();
+            
+            if (isAdmin) {
+                switchTab('intro');
+            } else {
+                switchTab('session1');
+            }
+        }
+
+        function updateQrElements(url) {
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+            const slideQr = document.getElementById('slideQrImg');
+            if (slideQr) slideQr.src = qrApiUrl;
+            
+            const modalQr = document.getElementById('modalQrImg');
+            if (modalQr) modalQr.src = qrApiUrl;
+            
+            const urlText = document.getElementById('modalUrlText');
+            if (urlText) urlText.innerText = url;
+        }
+
+        function handleUrlOverride(url) {
+            const cleanUrl = url.trim();
+            if (cleanUrl) {
+                localStorage.setItem('edu_cons_workshop_qr_url', cleanUrl);
+                updateQrElements(cleanUrl);
+            } else {
+                const defaultUrl = window.location.href;
+                localStorage.removeItem('edu_cons_workshop_qr_url');
+                updateQrElements(defaultUrl);
+            }
+        }
+
+        // --- REALTIME SYNC (FIRESTORE OBSERVERS) ---
+        function setupFirestoreListeners() {
+            if (!isFirebaseActive) return;
+
+            const mindsCol = collection(db, 'artifacts', appId, 'public', 'data', 'minds');
+            const actionsCol = collection(db, 'artifacts', appId, 'public', 'data', 'actions');
+
+            onSnapshot(mindsCol, (snapshot) => {
+                const tempMinds = [];
+                snapshot.forEach((doc) => {
+                    tempMinds.push({ id: doc.id, ...doc.data() });
+                });
+                minds = tempMinds;
+                localStorage.setItem(LS_MIND_KEY, JSON.stringify(minds));
+                renderMindBoard();
+                if (activeTab === 'dashboard') updateDashboard();
+                if (!document.getElementById('presenterModal').classList.contains('hidden')) updatePresenterContent();
+            }, (err) => {
+                console.warn("Minds cloud sync issue, switching to local backup:", err);
+            });
+
+            onSnapshot(actionsCol, (snapshot) => {
+                const tempActions = [];
+                snapshot.forEach((doc) => {
+                    tempActions.push({ id: doc.id, ...doc.data() });
+                });
+                actions = tempActions;
+                localStorage.setItem(LS_ACTION_KEY, JSON.stringify(actions));
+                renderActionBoard();
+                if (activeTab === 'dashboard') updateDashboard();
+                if (!document.getElementById('presenterModal').classList.contains('hidden')) updatePresenterContent();
+            }, (err) => {
+                console.warn("Actions cloud sync issue, switching to local backup:", err);
+            });
+        }
+
+        // --- WRITE ACTIONS & FORM SUBMIT HANDLERS ---
+        async function submitMind(e) {
+            e.preventDefault();
+            const textEl = document.getElementById('mindText');
+            const authorEl = document.getElementById('mindAuthor');
+            const catEl = document.getElementById('mindCategory');
+
+            const text = textEl.value.trim();
+            if (!text) return;
+
+            const docId = 'm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            const author = authorEl.value.trim() || '匿名';
+
+            const newMind = {
+                category: catEl.value,
+                text: text,
+                author: author,
+                likes: 0,
+                likedBy: [],
+                timestamp: Date.now(),
+                userId: myUserId
+            };
+
+            if (isFirebaseActive) {
+                try {
+                    const mindDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'minds', docId);
+                    await setDoc(mindDocRef, newMind);
+                } catch (err) {
+                    console.error("Cloud post failed, using local fallback", err);
+                    fallbackLocalAddMind(docId, newMind);
+                }
+            } else {
+                fallbackLocalAddMind(docId, newMind);
+            }
+
+            textEl.value = '';
+            authorEl.value = '';
+            showNotification('マインド付箋をボードにはりつけました！ 🌸', 'success');
+        }
+
+        function fallbackLocalAddMind(id, data) {
+            const newItem = { id, ...data };
+            minds.unshift(newItem);
+            localStorage.setItem(LS_MIND_KEY, JSON.stringify(minds));
+            renderMindBoard();
+            if (activeTab === 'dashboard') updateDashboard();
+        }
+
+        async function submitAction(e) {
+            e.preventDefault();
+            const textEl = document.getElementById('actionText');
+            const authorEl = document.getElementById('actionAuthor');
+            const catEl = document.getElementById('actionCategory');
+
+            const text = textEl.value.trim();
+            if (!text) return;
+
+            const docId = 'a_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            const author = authorEl.value.trim() || '匿名';
+
+            const newAction = {
+                category: catEl.value,
+                text: text,
+                author: author,
+                likes: 0,
+                likedBy: [],
+                timestamp: Date.now(),
+                userId: myUserId
+            };
+
+            if (isFirebaseActive) {
+                try {
+                    const actionDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'actions', docId);
+                    await setDoc(actionDocRef, newAction);
+                } catch (err) {
+                    console.error("Cloud post failed, using local fallback", err);
+                    fallbackLocalAddAction(docId, newAction);
+                }
+            } else {
+                fallbackLocalAddAction(docId, newAction);
+            }
+
+            textEl.value = '';
+            authorEl.value = '';
+            showNotification('あしたからの一歩をボードにはりつけました！ 🍈', 'success');
+        }
+
+        function fallbackLocalAddAction(id, data) {
+            const newItem = { id, ...data };
+            actions.unshift(newItem);
+            localStorage.setItem(LS_ACTION_KEY, JSON.stringify(actions));
+            renderActionBoard();
+            if (activeTab === 'dashboard') updateDashboard();
+        }
+
+        // --- LIKE INTERACTION ---
+        async function likeItem(type, id) {
+            if (isFirebaseActive) {
+                try {
+                    const collectionName = type === 'mind' ? 'minds' : 'actions';
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        let likedBy = data.likedBy || [];
+                        let likes = data.likes || 0;
+
+                        if (likedBy.includes(myUserId)) {
+                            likedBy = likedBy.filter(uid => uid !== myUserId);
+                            likes = Math.max(0, likes - 1);
+                        } else {
+                            likedBy.push(myUserId);
+                            likes++;
+                            showNotification(type === 'mind' ? 'すてきなマインドに共感しました！ 💞' : 'あしたからの一歩を応援しました！ ⭐', 'praise');
+                        }
+                        await updateDoc(docRef, { likes, likedBy });
+                    }
+                    return;
+                } catch (err) {
+                    console.warn("Cloud interaction issue, applying local fallback:", err);
+                }
+            }
+
+            // Local fallback logic
+            const targetArray = type === 'mind' ? minds : actions;
+            const target = targetArray.find(item => item.id === id);
+            if (target) {
+                if (!target.likedBy) target.likedBy = [];
+                if (target.likedBy.includes(myUserId)) {
+                    target.likedBy = target.likedBy.filter(uid => uid !== myUserId);
+                    target.likes = Math.max(0, (target.likes || 0) - 1);
+                } else {
+                    target.likedBy.push(myUserId);
+                    target.likes = (target.likes || 0) + 1;
+                    showNotification(type === 'mind' ? 'すてきなマインドに共感しました！ 💞' : 'あしたからの一歩を応援しました！ ⭐', 'praise');
+                }
+                localStorage.setItem(type === 'mind' ? LS_MIND_KEY : LS_ACTION_KEY, JSON.stringify(targetArray));
+                if (type === 'mind') renderMindBoard(); else renderActionBoard();
+                if (activeTab === 'dashboard') updateDashboard();
+            }
+        }
+
+        // --- RENDER LOGIC: MIND BOARD ---
+        function filterMindBoard(category) {
+            mindFilter = category;
+            document.querySelectorAll('.filter-mind-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#fff0f0]', 'text-[#ff8b94]', 'shadow-sm', 'border-2', 'border-[#ffccd5]');
+                btn.classList.add('text-[#7a6452]', 'hover:bg-[#fff0f0]');
+            });
+            const activeBtn = document.getElementById(`filter-mind-${category}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-[#fff0f0]', 'text-[#ff8b94]', 'shadow-sm', 'border-2', 'border-[#ffccd5]');
+                activeBtn.classList.remove('text-[#7a6452]', 'hover:bg-[#fff0f0]');
+            }
+            renderMindBoard();
+        }
+
+        function renderMindBoard() {
+            const grid = document.getElementById('mindNotesGrid');
+            const emptyState = document.getElementById('mindEmptyState');
+            const sortVal = document.getElementById('mindSort').value;
+            grid.innerHTML = '';
+
+            let filtered = [...minds];
+            if (mindFilter !== 'All') {
+                filtered = filtered.filter(item => item.category === mindFilter);
+            }
+
+            if (sortVal === 'newest') {
+                filtered.sort((a, b) => b.timestamp - a.timestamp);
+            } else if (sortVal === 'likes') {
+                filtered.sort((a, b) => b.likes - a.likes);
+            }
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+
+                filtered.forEach(mind => {
+                    const colorClasses = getMindCategoryColor(mind.category);
+                    const note = document.createElement('div');
+                    const hasLiked = mind.likedBy && mind.likedBy.includes(myUserId);
+                    
+                    note.className = `sticky-note bg-[#fffcf5] border-4 ${colorClasses.borderClass} p-5 flex flex-col justify-between shadow-sm relative overflow-hidden`;
+                    note.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 ${colorClasses.badgeBg} ${colorClasses.badgeText} text-xs font-black rounded-full flex items-center space-x-1 border">
+                                    <span>${colorClasses.icon}</span>
+                                    <span>${mind.category}</span>
+                                </span>
+                                <span class="text-[11px] text-[#c0a894] font-bold">${timeAgo(mind.timestamp)}</span>
+                            </div>
+                            <p class="text-[#5c4a3c] text-sm leading-relaxed font-black break-words">${escapeHTML(mind.text)}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-5 pt-3 border-t border-[#f4ebd9]/60">
+                            <span class="text-xs text-[#a68d77] font-black flex items-center space-x-1" title="受講者ID: ${mind.userId || '不明'}">
+                                <span class="text-base">🧸</span>
+                                <span class="truncate max-w-[100px]">${escapeHTML(mind.author) || '匿名'}</span>
+                            </span>
+                            <button onclick="likeItem('mind', '${mind.id}')" class="bouncy-btn flex items-center space-x-1.5 text-xs font-black px-3 py-1.5 rounded-full transition-all hover:bg-rose-100 hover:text-rose-600 ${hasLiked ? 'text-rose-600 bg-rose-50 border-2 border-rose-300' : 'text-[#a68d77] bg-[#fcf8f2] border border-[#f0e4d2]' }">
+                                <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-rose-400"></i>
+                                <span>すてき！ ${mind.likes || 0}</span>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(note);
+                });
+            }
+            updateCounters();
+        }
+
+        // --- RENDER LOGIC: ACTION BOARD ---
+        function filterActionBoard(category) {
+            actionFilter = category;
+            document.querySelectorAll('.filter-action-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#eafaf4]', 'text-[#2c7a5f]', 'shadow-sm', 'border-2', 'border-[#b5ead7]');
+                btn.classList.add('text-[#7a6452]', 'hover:bg-[#eafaf4]');
+            });
+            const activeBtn = document.getElementById(`filter-action-${category}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-[#eafaf4]', 'text-[#2c7a5f]', 'shadow-sm', 'border-2', 'border-[#b5ead7]');
+                activeBtn.classList.remove('text-[#7a6452]', 'hover:bg-[#eafaf4]');
+            }
+            renderActionBoard();
+        }
+
+        function renderActionBoard() {
+            const grid = document.getElementById('actionNotesGrid');
+            const emptyState = document.getElementById('actionEmptyState');
+            const sortVal = document.getElementById('actionSort').value;
+            grid.innerHTML = '';
+
+            let filtered = [...actions];
+            if (actionFilter !== 'All') {
+                filtered = filtered.filter(item => item.category === actionFilter);
+            }
+
+            if (sortVal === 'newest') {
+                filtered.sort((a, b) => b.timestamp - a.timestamp);
+            } else if (sortVal === 'likes') {
+                filtered.sort((a, b) => b.likes - a.likes);
+            }
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+
+                filtered.forEach(action => {
+                    const colorClasses = getActionCategoryColor(action.category);
+                    const note = document.createElement('div');
+                    const hasLiked = action.likedBy && action.likedBy.includes(myUserId);
+                    
+                    note.className = `sticky-note bg-[#fcfdfa] border-4 ${colorClasses.borderClass} p-5 flex flex-col justify-between shadow-sm relative overflow-hidden`;
+                    note.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 ${colorClasses.badgeBg} ${colorClasses.badgeText} text-xs font-black rounded-full flex items-center space-x-1 border">
+                                    <span>${colorClasses.icon}</span>
+                                    <span>${action.category}</span>
+                                </span>
+                                <span class="text-[11px] text-[#c0a894] font-bold">${timeAgo(action.timestamp)}</span>
+                            </div>
+                            <p class="text-[#5c4a3c] text-sm leading-relaxed font-black break-words">${escapeHTML(action.text)}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-5 pt-3 border-t border-[#f4ebd9]/60">
+                            <span class="text-xs text-[#a68d77] font-black flex items-center space-x-1" title="受講者ID: ${action.userId || '不明'}">
+                                <span class="text-base">🐣</span>
+                                <span class="truncate max-w-[100px]">${escapeHTML(action.author) || '匿名'}</span>
+                            </span>
+                            <button onclick="likeItem('action', '${action.id}')" class="bouncy-btn flex items-center space-x-1.5 text-xs font-black px-3 py-1.5 rounded-full transition-all hover:bg-emerald-100 hover:text-emerald-700 ${hasLiked ? 'text-emerald-700 bg-emerald-50 border-2 border-emerald-300' : 'text-[#a68d77] bg-[#fcfdf2] border border-[#f0e4d2]' }">
+                                <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up text-emerald-500"></i>
+                                <span>わかる！ ${action.likes || 0}</span>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(note);
+                });
+            }
+            updateCounters();
+        }
+
+        // --- VISUAL COLOR MAPPING HELPER FUNCTIONS ---
+        function getMindCategoryColor(category) {
+            switch(category) {
+                case '傾聴・共感':
+                    return { borderClass: 'border-[#ffb7b2]', badgeBg: 'bg-[#fff0f0]', badgeText: 'text-[#d66870]', icon: '🎧' };
+                case '受容・見守り':
+                    return { borderClass: 'border-[#ffdac1]', badgeBg: 'bg-[#fffcf0]', badgeText: 'text-[#e0a96d]', icon: '🌱' };
+                case 'チーム・組織対応':
+                    return { borderClass: 'border-[#c7ecee]', badgeBg: 'bg-[#f0fafc]', badgeText: 'text-[#3c8da6]', icon: '🤝' };
+                case '早期発見・予防':
+                    return { borderClass: 'border-[#e2f0cb]', badgeBg: 'bg-[#f4fbf0]', badgeText: 'text-[#7ca852]', icon: '🔍' };
+                default:
+                    return { borderClass: 'border-[#ebd8c5]', badgeBg: 'bg-[#faf4eb]', badgeText: 'text-[#8c7460]', icon: '💡' };
+            }
+        }
+
+        function getActionCategoryColor(category) {
+            switch(category) {
+                case '子どもへの関わり':
+                    return { borderClass: 'border-[#b5ead7]', badgeBg: 'bg-[#f0faf5]', badgeText: 'text-[#2a9d8f]', icon: '💬' };
+                case '環境・場づくり':
+                    return { borderClass: 'border-[#e2f0cb]', badgeBg: 'bg-[#f4fbf0]', badgeText: 'text-[#5a9a5a]', icon: '🏫' };
+                case '同僚・連携・情報共有':
+                    return { borderClass: 'border-[#ffdac1]', badgeBg: 'bg-[#fffcf0]', badgeText: 'text-[#d68a52]', icon: '📣' };
+                case '心のセルフケア':
+                    return { borderClass: 'border-[#ffb7b2]', badgeBg: 'bg-[#fff0f0]', badgeText: 'text-[#d66870]', icon: '🔋' };
+                default:
+                    return { borderClass: 'border-[#ebd8c5]', badgeBg: 'bg-[#faf4eb]', badgeText: 'text-[#8c7460]', icon: '💡' };
+            }
+        }
+
+        // --- DASHBOARD UPDATES & ANALYTICS ---
+        function updateDashboard() {
+            const mindCounts = { '傾聴・共感': 0, '受容・見守り': 0, 'チーム・組織対応': 0, '早期発見・予防': 0, 'その他': 0 };
+            minds.forEach(m => { if(mindCounts[m.category] !== undefined) mindCounts[m.category]++ });
+
+            const actionCounts = { '子どもへの関わり': 0, '環境・場づくり': 0, '同僚・連携・情報共有': 0, '心のセルフケア': 0, 'その他': 0 };
+            actions.forEach(a => { if(actionCounts[a.category] !== undefined) actionCounts[a.category]++ });
+
+            if (mindChartInstance) {
+                mindChartInstance.data.datasets[0].data = Object.values(mindCounts);
+                mindChartInstance.update();
+            }
+
+            if (actionChartInstance) {
+                actionChartInstance.data.datasets[0].data = [
+                    actionCounts['子どもへの関わり'],
+                    actionCounts['環境・場づくり'],
+                    actionCounts['同僚・連携・情報共有'],
+                    actionCounts['心のセルフケア'],
+                    actionCounts['その他']
+                ];
+                actionChartInstance.update();
+            }
+
+            updateCounters();
+            renderTablePreviews();
+            renderParticipantTracker();
+        }
+
+        function getParticipantStats() {
+            const stats = {};
+
+            minds.forEach(m => {
+                const uid = m.userId || 'anonymous-mind';
+                if (!stats[uid]) {
+                    stats[uid] = { nickname: m.author || '匿名', mindCount: 0, actionCount: 0, receivedLikes: 0 };
+                }
+                stats[uid].mindCount++;
+                stats[uid].receivedLikes += (m.likes || 0);
+                if (m.author && m.author !== '匿名') {
+                    stats[uid].nickname = m.author;
+                }
+            });
+
+            actions.forEach(a => {
+                const uid = a.userId || 'anonymous-action';
+                if (!stats[uid]) {
+                    stats[uid] = { nickname: a.author || '匿名', mindCount: 0, actionCount: 0, receivedLikes: 0 };
+                }
+                stats[uid].actionCount++;
+                stats[uid].receivedLikes += (a.likes || 0);
+                if (a.author && a.author !== '匿名') {
+                    stats[uid].nickname = a.author;
+                }
+            });
+
+            return stats;
+        }
+
+        function renderParticipantTracker() {
+            const tBody = document.getElementById('participantTableBody');
+            if (!tBody) return;
+            tBody.innerHTML = '';
+
+            const stats = getParticipantStats();
+            const uids = Object.keys(stats);
+
+            if (uids.length === 0) {
+                tBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-400 font-bold">まだ受講生の投稿履歴がありません 🍃</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            uids.forEach(uid => {
+                const user = stats[uid];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-mono font-bold text-xs text-gray-500">${uid}</td>
+                    <td class="px-4 py-3 text-emerald-800 font-black">${escapeHTML(user.nickname)}</td>
+                    <td class="px-4 py-3 text-center font-bold text-[#e57c82]">${user.mindCount}</td>
+                    <td class="px-4 py-3 text-center font-bold text-emerald-600">${user.actionCount}</td>
+                    <td class="px-4 py-3 text-center font-bold text-amber-500"><i class="fa-solid fa-star"></i> ${user.receivedLikes}</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2.5 py-1 text-[10px] rounded-full font-black ${ (user.mindCount > 0 && user.actionCount > 0) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }">
+                            ${ (user.mindCount > 0 && user.actionCount > 0) ? 'ワーク全完了 ✨' : '一部未完了 🐾' }
+                        </span>
+                    </td>
+                `;
+                tBody.appendChild(tr);
+            });
+        }
+
+        function renderTablePreviews() {
+            const mBody = document.getElementById('mindTableBody');
+            const aBody = document.getElementById('actionTableBody');
+
+            mBody.innerHTML = '';
+            aBody.innerHTML = '';
+
+            minds.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-black text-[#8c7460]">${m.category}</td>
+                    <td class="px-4 py-3 text-[#5c4a3c] truncate max-w-[150px]" title="${escapeHTML(m.text)}">${escapeHTML(m.text)}</td>
+                    <td class="px-4 py-3 text-[#a68d77]">${escapeHTML(m.author)}</td>
+                    <td class="px-4 py-3 text-[#ff8b94] font-black"><i class="fa-solid fa-heart"></i> ${m.likes || 0}</td>
+                `;
+                mBody.appendChild(tr);
+            });
+
+            actions.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-black text-[#8c7460]">${a.category}</td>
+                    <td class="px-4 py-3 text-[#5c4a3c] truncate max-w-[150px]" title="${escapeHTML(a.text)}">${escapeHTML(a.text)}</td>
+                    <td class="px-4 py-3 text-[#a68d77]">${escapeHTML(a.author)}</td>
+                    <td class="px-4 py-3 text-[#2a9d8f] font-black"><i class="fa-solid fa-thumbs-up"></i> ${a.likes || 0}</td>
+                `;
+                aBody.appendChild(tr);
+            });
+        }
+
+        function updateCounters() {
+            document.getElementById('count-mind-all').innerText = minds.length;
+            document.getElementById('count-mind-listen').innerText = minds.filter(m => m.category === '傾聴・共感').length;
+            document.getElementById('count-mind-accept').innerText = minds.filter(m => m.category === '受容・見守り').length;
+            document.getElementById('count-mind-team').innerText = minds.filter(m => m.category === 'チーム・組織対応').length;
+            document.getElementById('count-mind-early').innerText = minds.filter(m => m.category === '早期発見・予防').length;
+
+            document.getElementById('count-action-all').innerText = actions.length;
+            document.getElementById('count-action-child').innerText = actions.filter(a => a.category === '子どもへの関わり').length;
+            document.getElementById('count-action-env').innerText = actions.filter(a => a.category === '環境・場づくり').length;
+            document.getElementById('count-action-team').innerText = actions.filter(a => a.category === '同僚・連携・情報共有').length;
+            document.getElementById('count-action-care').innerText = actions.filter(a => a.category === '心のセルフケア').length;
+
+            document.getElementById('mindCount').innerText = minds.length;
+            document.getElementById('actionCount').innerText = actions.length;
+
+            const mindLikes = minds.reduce((acc, curr) => acc + (curr.likes || 0), 0);
+            const actionLikes = actions.reduce((acc, curr) => acc + (curr.likes || 0), 0);
+            document.getElementById('totalInteractionCount').innerText = mindLikes + actionLikes;
+
+            // 受講者のユニークIDベースで実受講者数をカウント
+            const stats = getParticipantStats();
+            const uniqCount = Object.keys(stats).length;
+            document.getElementById('activeUsersCount').innerText = Math.max(1, uniqCount);
+        }
+
+        // --- EXPORT FUNCTIONALITIES ---
+        function downloadParticipantReport() {
+            const stats = getParticipantStats();
+            const uids = Object.keys(stats);
+
+            if (uids.length === 0) {
+                showNotification('エクスポートするデータがありません 💡', 'warning');
+                return;
+            }
+
+            let csvContent = "\uFEFF";
+            csvContent += "受講者一意ID,設定されたお名前,ワーク1マインド投稿数,ワーク2一歩投稿数,総獲得共感数,研修履修状態\r\n";
+
+            uids.forEach(uid => {
+                const user = stats[uid];
+                const status = (user.mindCount > 0 && user.actionCount > 0) ? "ワーク完了" : "一部未完了";
+                csvContent += `"${uid}","${user.nickname.replace(/"/g, '""')}",${user.mindCount},${user.actionCount},${user.receivedLikes},"${status}"\r\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `教育相談研修_受講者活動一覧報告.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('受講者活動レポート(CSV)をダウンロードしました！ 📥', 'success');
+        }
+
+        function downloadCSV(type) {
+            let data = [];
+            let filename = '';
+            
+            if (type === 'session1') {
+                data = minds;
+                filename = '教育相談研修_共通マインド集計.csv';
+            } else {
+                data = actions;
+                filename = '教育相談研修_あしたからの一歩.csv';
+            }
+
+            if (data.length === 0) {
+                showNotification('書き出せるデータがまだありません 🍬', 'warning');
+                return;
+            }
+
+            let csvContent = "\uFEFF";
+            csvContent += "付箋ID,カテゴリ,表明したおもい,投稿したひと,あつまった共感数,受講生ID,書き込み時間\r\n";
+
+            data.forEach(item => {
+                const row = [
+                    item.id,
+                    `"${item.category.replace(/"/g, '""')}"`,
+                    `"${item.text.replace(/"/g, '""')}"`,
+                    `"${(item.author || '匿名').replace(/"/g, '""')}"`,
+                    item.likes || 0,
+                    `"${item.userId || '不明'}"`,
+                    new Date(item.timestamp).toLocaleString('ja-JP')
+                ];
+                csvContent += row.join(",") + "\r\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('CSVを保存しました！ 🌸', 'success');
+        }
+
+        function copyToClipboardTSV() {
+            if (minds.length === 0 && actions.length === 0) {
+                showNotification('まだコピーするデータがありません 💡', 'warning');
+                return;
+            }
+
+            let tsvString = "【研修はじめ：たいせつにしたいマインド】\nカテゴリ\t意見・おもい\t書いたひと\t共感数\t受講生ID\t投稿じかん\n";
+            minds.forEach(m => {
+                tsvString += `${m.category}\t${m.text}\t${m.author || '匿名'}\t${m.likes || 0}\t${m.userId || '不明'}\t${new Date(m.timestamp).toLocaleString('ja-JP')}\n`;
+            });
+
+            tsvString += "\n【研修おわり：あしたからの一歩】\nカテゴリ\tアクションプラン\t書いたひと\t共感数\t受講生ID\t投稿じかん\n";
+            actions.forEach(a => {
+                tsvString += `${a.category}\t${a.text}\t${a.author || '匿名'}\t${a.likes || 0}\t${a.userId || '不明'}\t${new Date(a.timestamp).toLocaleString('ja-JP')}\n`;
+            });
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = tsvString;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showNotification('スプレッドシート貼付用のデータをコピーしました！ 📋', 'success');
+            } catch (err) {
+                showNotification('コピーに失敗しました。', 'warning');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // --- MASTER DATA CLEAR ---
+        async function clearAllData() {
+            if (!isAdmin) return;
+            
+            const isConfirmed = confirm('【警告】すべての付箋や共感データを完全にリセットします。よろしいですか？');
+            if (isConfirmed) {
+                if (isFirebaseActive) {
+                    try {
+                        const mindsCol = collection(db, 'artifacts', appId, 'public', 'data', 'minds');
+                        const actionsCol = collection(db, 'artifacts', appId, 'public', 'data', 'actions');
+                        const mindDocs = await getDocs(mindsCol);
+                        const actionDocs = await getDocs(actionsCol);
+                        const batch = writeBatch(db);
+                        
+                        mindDocs.forEach(d => batch.delete(doc(db, 'artifacts', appId, 'public', 'data', 'minds', d.id)));
+                        actionDocs.forEach(d => batch.delete(doc(db, 'artifacts', appId, 'public', 'data', 'actions', d.id)));
+
+                        await batch.commit();
+                        showNotification('クラウドデータベースを初期化しました 🧹', 'success');
+                    } catch (err) {
+                        console.error("Cloud DB clear failed:", err);
+                    }
+                }
+
+                // Local reset fallback
+                minds = [];
+                actions = [];
+                localStorage.setItem(LS_MIND_KEY, JSON.stringify(minds));
+                localStorage.setItem(LS_ACTION_KEY, JSON.stringify(actions));
+                
+                renderMindBoard();
+                renderActionBoard();
+                if (activeTab === 'dashboard') updateDashboard();
+                showNotification('すべてのボードデータをまっさらに初期化しました 🧹', 'success');
+            }
+        }
+
+        // --- PRESENTATION SCREEN & MODALS ---
+        let presenterSession = 'session1';
+
+        function openPresenterMode(sessionType) {
+            presenterSession = sessionType;
+            const modal = document.getElementById('presenterModal');
+            const badge = document.getElementById('presenterBadge');
+            const title = document.getElementById('presenterTitle');
+
+            if (sessionType === 'session1') {
+                badge.className = "bg-[#ffb7b2] text-white text-xs px-4 py-2 rounded-full font-black border-2 border-white";
+                badge.innerText = "さいしょ：共通マインド";
+                title.innerText = "みんなで大切にする「基本のマインド」 🍓";
+            } else {
+                badge.className = "bg-[#77cca4] text-white text-xs px-4 py-2 rounded-full font-black border-2 border-white";
+                badge.innerText = "さいご：ちいさな一歩";
+                title.innerText = "あしたから実践する「ちいさな一歩」 🌱";
+            }
+
+            updatePresenterContent();
+            modal.classList.remove('hidden');
+        }
+
+        function closePresenterMode() {
+            document.getElementById('presenterModal').classList.add('hidden');
+        }
+
+        function updatePresenterContent() {
+            const grid = document.getElementById('presenterGrid');
+            const counter = document.getElementById('presenterCount');
+            grid.innerHTML = '';
+
+            if (presenterSession === 'session1') {
+                counter.innerText = minds.length;
+                minds.forEach(mind => {
+                    const colorClasses = getMindCategoryColor(mind.category);
+                    const isHot = (mind.likes || 0) >= 4;
+                    const card = document.createElement('div');
+                    card.className = `p-6 rounded-[2rem] border-4 flex flex-col justify-between transition-all ${isHot ? 'bg-[#523e30] border-[#ffb7b2] shadow-[0_0_20px_rgba(255,183,178,0.4)] text-white' : 'bg-[#403126] border-slate-700/50 text-[#ffebd6]'}`;
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 text-[10px] font-black rounded-full bg-[#3a2c22] text-[#ffccd5] border border-slate-700">
+                                    ${colorClasses.icon} ${mind.category}
+                                </span>
+                                ${isHot ? '<span class="text-amber-400 text-xs font-black animate-pulse"><i class="fa-solid fa-crown mr-1"></i>すてき多数</span>' : ''}
+                            </div>
+                            <p class="text-sm sm:text-base font-black leading-relaxed">${escapeHTML(mind.text)}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-6 pt-3 border-t border-slate-800">
+                            <span class="text-xs text-slate-400 font-bold"><span class="mr-1">🧸</span>${escapeHTML(mind.author)}</span>
+                            <div class="flex items-center space-x-1 text-rose-400 text-xs font-black">
+                                <i class="fa-solid fa-heart animate-pulse"></i>
+                                <span>${mind.likes || 0}</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else {
+                counter.innerText = actions.length;
+                actions.forEach(action => {
+                    const colorClasses = getActionCategoryColor(action.category);
+                    const isHot = (action.likes || 0) >= 4;
+                    const card = document.createElement('div');
+                    card.className = `p-6 rounded-[2rem] border-4 flex flex-col justify-between transition-all ${isHot ? 'bg-[#523e30] border-[#77cca4] shadow-[0_0_20px_rgba(119,204,164,0.4)] text-white' : 'bg-[#403126] border-slate-700/50 text-[#ffebd6]'}`;
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 text-[10px] font-black rounded-full bg-[#3a2c22] text-[#b5ead7] border border-slate-700">
+                                    ${colorClasses.icon} ${action.category}
+                                </span>
+                                ${isHot ? '<span class="text-[#77cca4] text-xs font-black animate-pulse"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>共感多数</span>' : ''}
+                            </div>
+                            <p class="text-sm sm:text-base font-black leading-relaxed">${escapeHTML(action.text)}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-6 pt-3 border-t border-slate-800">
+                            <span class="text-xs text-slate-400 font-bold"><span class="mr-1">🐹</span>${escapeHTML(action.author)}</span>
+                            <div class="flex items-center space-x-1 text-emerald-400 text-xs font-black">
+                                <i class="fa-solid fa-thumbs-up"></i>
+                                <span>${action.likes || 0}</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // --- HELPER UTILITIES & UI TRANSITIONS ---
+        function switchTab(tabId) {
+            if (!isAdmin && (tabId === 'intro' || tabId === 'guide')) {
+                openAdminModal(tabId);
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-white', 'bg-[#ffb7b2]', 'shadow-sm', 'bg-[#ff9aa2]', 'bg-[#77cca4]', 'bg-[#ebd8c5]', 'bg-[#ffdac1]');
+                btn.classList.add('text-[#7a6452]', 'hover:bg-white/50');
+            });
+
+            const targetContent = document.getElementById(`content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('block');
+            }
+
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            if (targetBtn) {
+                let activeColorClass = 'bg-[#ffb7b2]';
+                if (tabId === 'intro') activeColorClass = 'bg-[#ffb7b2]';
+                if (tabId === 'session1') activeColorClass = 'bg-[#ff9aa2]';
+                if (tabId === 'session2') activeColorClass = 'bg-[#77cca4]';
+                if (tabId === 'dashboard') activeColorClass = 'bg-[#ebd8c5] text-[#5c4a3c]';
+                if (tabId === 'guide') activeColorClass = 'bg-[#ffdac1] text-[#5c4a3c]';
+
+                targetBtn.classList.add('active', 'text-white', activeColorClass, 'shadow-sm');
+                targetBtn.classList.remove('text-[#7a6452]', 'hover:bg-white/50');
+            }
+
+            activeTab = tabId;
+            if (tabId === 'dashboard') updateDashboard();
+        }
+
+        function openAdminModal(tabTarget = null) {
+            pendingTabTarget = tabTarget;
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('adminModalTitle');
+            const desc = document.getElementById('adminModalDesc');
+            const btnText = document.getElementById('adminModalBtnText');
+            const icon = document.getElementById('adminModalIcon');
+            const passInput = document.getElementById('adminPassInput');
+            
+            passInput.value = '';
+
+            if (isAdmin) {
+                logoutAdmin();
+                return;
+            }
+
+            const storedPass = localStorage.getItem(LS_ADMIN_PASS_KEY);
+            if (!storedPass) {
+                title.innerText = "主催者パスワードの初期設定 🎈";
+                desc.innerText = "本日の研修で、スライド進行や主催者用テキスト、全リセットを管理するためのパスワードを新しく設定してください。";
+                btnText.innerText = "パスワードを設定する 🌱";
+                icon.className = "fa-solid fa-user-plus text-[#e67e22]";
+            } else {
+                title.innerText = "主催者ログイン 🔑";
+                desc.innerText = "パスワードを入力して主催者モードをONにしてください。（主催者用スライド進行、主催者の虎の巻、データの一括リセット機能が解放されます）";
+                btnText.innerText = "ロックを解除する ✨";
+                icon.className = "fa-solid fa-lock-open text-[#e67e22]";
+            }
+
+            modal.classList.remove('hidden');
+            passInput.focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            pendingTabTarget = null;
+        }
+
+        function submitAdminPassword(e) {
+            e.preventDefault();
+            const passInput = document.getElementById('adminPassInput').value.trim();
+            const storedPass = localStorage.getItem(LS_ADMIN_PASS_KEY);
+
+            if (!storedPass) {
+                if (passInput.length < 4) {
+                    showNotification('パスワードは4文字以上で設定してください 🐾', 'warning');
+                    return;
+                }
+                localStorage.setItem(LS_ADMIN_PASS_KEY, passInput);
+                loginAdmin();
+                showNotification('主催者パスワードを設定しました！ 🌻', 'success');
+            } else {
+                if (passInput === storedPass) {
+                    loginAdmin();
+                    showNotification('主催者モードでログインしました！ 🎓', 'success');
+                } else {
+                    showNotification('パスワードが違います 😢 もう一度試してね。', 'warning');
+                    return;
+                }
+            }
+
+            closeAdminModal();
+            if (pendingTabTarget) {
+                switchTab(pendingTabTarget);
+                pendingTabTarget = null;
+            }
+        }
+
+        function loginAdmin() {
+            isAdmin = true;
+            updateAdminUI();
+            if (activeTab === 'session1' && !pendingTabTarget) {
+                switchTab('intro');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            updateAdminUI();
+            showNotification('主催者モードを解除（ログアウト）しました 🐾', 'info');
+            if (activeTab === 'intro' || activeTab === 'guide') {
+                switchTab('session1');
+            }
+        }
+
+        function updateAdminUI() {
+            const btnText = document.getElementById('adminBtnText');
+            const btnIcon = document.getElementById('adminBtnIcon');
+            const loginBtn = document.getElementById('adminLoginBtn');
+            const resetArea = document.getElementById('adminResetArea');
+            const trackerSection = document.getElementById('adminTrackerSection');
+
+            const introLock = document.getElementById('lock-icon-intro');
+            const guideLock = document.getElementById('lock-icon-guide');
+
+            if (isAdmin) {
+                btnText.innerText = "主催者ログアウト 🔓";
+                loginBtn.className = "bouncy-btn flex items-center space-x-1.5 px-4 py-2 bg-[#ffccd5] border-2 border-[#ff9aa2] text-[#d66870] rounded-full text-xs font-bold shadow-sm";
+                btnIcon.className = "fa-solid fa-lock-open";
+                resetArea.classList.remove('hidden'); 
+                if (trackerSection) trackerSection.classList.remove('hidden');
+                
+                if (introLock) introLock.className = "fa-solid fa-desktop mr-0.5 text-emerald-500";
+                if (guideLock) guideLock.className = "fa-solid fa-book-open mr-0.5 text-emerald-500";
+                
+                document.getElementById('mindEmptyHint').innerText = "最初のふせんを受講者が投稿するのを待つか、ボードに貼り付けてみてください！";
+                document.getElementById('actionEmptyHint').innerText = "最初のアクション宣言を受講者が投稿するのを待つか、ボードに貼り付けてみてください！";
+            } else {
+                btnText.innerText = "主催者ログイン 🔑";
+                loginBtn.className = "bouncy-btn flex items-center space-x-1.5 px-4 py-2 bg-[#fdf2e9] border-2 border-[#ffd8b3] text-[#d35400] rounded-full text-xs font-bold shadow-sm";
+                btnIcon.className = "fa-solid fa-key";
+                resetArea.classList.add('hidden'); 
+                if (trackerSection) trackerSection.classList.add('hidden');
+                
+                if (introLock) introLock.className = "fa-solid fa-lock text-[#ff9aa2] mr-0.5";
+                if (guideLock) guideLock.className = "fa-solid fa-lock text-[#ebd8c5] mr-0.5";
+
+                document.getElementById('mindEmptyHint').innerText = "最初のふせんをボードにはりつけてみましょう！";
+                document.getElementById('actionEmptyHint').innerText = "最後のアクションを宣言してボードにはりつけてみましょう！";
+            }
+        }
+
+        // --- INTERACTIVE SLIDE CONTROLLER VIEW ---
+        const trainerScripts = [
+            `【進行例】 「先生方、お忙しい中お集まりいただきありがとうございます。ほっこり対話カフェへようこそ！批判や否定は今日はおやすみして、ニックネームでゆるりと本音を語り合いましょう。」`,
+            `【進行例】 「教育相談の基本となる4つの姿勢です。答えを急ぐことよりも、寄り添う『傾聴』や『チーム連携』が大事です。普段の自分自身の姿勢はどうかな？と少し考えてみましょう。」`,
+            `【進行例】 「【ワーク1】の開始です。あなたが面談や日々の子どもたちとの対話で『これだけは忘れたくないマインド』を、端末から貼り付けてください。出揃ったら『すてき！』を押し合いましょう。」`,
+            `【進行例】 「【ワーク2】明日からできるアクションです。大げさなものではなく『目線をいつもより長めにあわせる』など、明日確実にできる極小の一歩を設定してください。みんなで『わかる！』を送りましょう。」`,
+            `【進行例】 「集まった一歩の数々を、グラフや一覧で振り返りましょう。今日みんなで紡ぎ出したあたたかい種が、明日からの学校現場を少しずつ明るく変えていきます。大変お疲れ様でした！」`
+        ];
+
+        function updateSlideView() {
+            for (let i = 0; i < 5; i++) {
+                const el = document.getElementById(`slide-${i}`);
+                if (el) el.className = "slide-card hidden";
+            }
+
+            const activeSlideEl = document.getElementById(`slide-${currentSlide}`);
+            if (activeSlideEl) {
+                activeSlideEl.className = "slide-card block space-y-4 animate-fade-in";
+            }
+
+            document.getElementById('currentSlideNum').innerText = currentSlide + 1;
+            const badge = document.getElementById('slideBadge');
+            
+            const badges = [
+                "導入とグラウンドルール 🌸",
+                "教育相談の基本姿勢 🍓",
+                "ワーク1：たいせつなマインド ✏️",
+                "ワーク2：あしたへの一歩 🍈",
+                "まとめとふりかえり 🌈"
+            ];
+            badge.innerText = badges[currentSlide];
+
+            const prevBtn = document.getElementById('prevSlideBtn');
+            const nextBtn = document.getElementById('nextSlideBtn');
+
+            if (currentSlide === 0) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            if (currentSlide === 4) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            const dots = document.getElementById('slideDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentSlide) {
+                    dots[i].className = "w-3 h-3 rounded-full bg-[#ffb7b2] cursor-pointer";
+                } else {
+                    dots[i].className = "w-3 h-3 rounded-full bg-gray-200 cursor-pointer";
+                }
+            }
+
+            document.getElementById('scriptContent').innerText = trainerScripts[currentSlide];
+        }
+
+        function nextSlide() { if (currentSlide < 4) { currentSlide++; updateSlideView(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlideView(); } }
+        function goToSlide(slideIndex) { currentSlide = slideIndex; updateSlideView(); }
+        function toggleTrainerScript() {
+            const scriptArea = document.getElementById('trainerScriptArea');
+            const toggleIcon = document.getElementById('scriptToggleIcon');
+            if (scriptArea.classList.contains('hidden')) {
+                scriptArea.classList.remove('hidden');
+                toggleIcon.innerHTML = `<i class="fa-solid fa-chevron-up text-[10px]"></i>`;
+            } else {
+                scriptArea.classList.add('hidden');
+                toggleIcon.innerHTML = `<i class="fa-solid fa-chevron-down text-[10px]"></i>`;
+            }
+        }
+
+        // --- CHART GENERATOR ---
+        function setupCharts() {
+            const ctxMind = document.getElementById('mindChart').getContext('2d');
+            mindChartInstance = new Chart(ctxMind, {
+                type: 'doughnut',
+                data: {
+                    labels: ['傾聴・共感', '受容・見守り', 'チーム・組織対応', '早期発見・予防', 'その他'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: ['#ffb7b2', '#ffdac1', '#c7ecee', '#e2f0cb', '#ebd8c5'],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11, family: 'Zen Maru Gothic', weight: 'bold' },
+                                boxWidth: 14,
+                                color: '#5c4a3c'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctxAction = document.getElementById('actionChart').getContext('2d');
+            actionChartInstance = new Chart(ctxAction, {
+                type: 'bar',
+                data: {
+                    labels: ['子ども関わり 💬', '環境・場 🏫', '職員室連携 📣', 'セルフケア 🔋', 'その他 💡'],
+                    datasets: [{
+                        label: 'あしたの一歩宣言数',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: '#77cca4',
+                        borderRadius: 16,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: '#a68d77', font: { family: 'Zen Maru Gothic' } },
+                            grid: { color: '#faf4eb' }
+                        },
+                        x: {
+                            ticks: { color: '#5c4a3c', font: { size: 10, family: 'Zen Maru Gothic', weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function timeAgo(pastTimestamp) {
+            const diff = Date.now() - pastTimestamp;
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'たった今 🍼';
+            if (mins < 60) return `${mins}分前`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}時間前`;
+            return 'おととい以前';
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function showNotification(message, type) {
+            const toast = document.getElementById('notificationToast');
+            const icon = document.getElementById('notifyIcon');
+            const text = document.getElementById('notifyText');
+
+            text.innerText = message;
+            
+            if (type === 'success') {
+                icon.className = "fa-solid fa-cookie text-pink-400 text-lg animate-bounce";
+            } else if (type === 'like' || type === 'praise') {
+                icon.className = "fa-solid fa-heart text-[#ff8b94] text-lg animate-ping";
+            } else {
+                icon.className = "fa-solid fa-face-smile text-amber-400 text-lg";
+            }
+
+            toast.classList.remove('opacity-0', 'translate-y-20');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-20');
+            }, 3500);
+        }
+
+        function openQrModal() { document.getElementById('qrModal').classList.remove('hidden'); }
+        function closeQrModal() { document.getElementById('qrModal').classList.add('hidden'); }
+
+        // --- ATTACH HANDLERS TO WINDOW OBJECT FOR GLOBALS (CRITICAL FOR ONCLICK) ---
+        window.switchTab = switchTab;
+        window.openAdminModal = openAdminModal;
+        window.closeAdminModal = closeAdminModal;
+        window.submitAdminPassword = submitAdminPassword;
+        window.nextSlide = nextSlide;
+        window.prevSlide = prevSlide;
+        window.goToSlide = goToSlide;
+        window.toggleTrainerScript = toggleTrainerScript;
+        
+        window.submitMind = submitMind;
+        window.submitAction = submitAction;
+        window.filterMindBoard = filterMindBoard;
+        window.filterActionBoard = filterActionBoard;
+        window.renderMindBoard = renderMindBoard;
+        window.renderActionBoard = renderActionBoard;
+        window.likeItem = likeItem;
+
+        window.openPresenterMode = openPresenterMode;
+        window.closePresenterMode = closePresenterMode;
+        window.clearAllData = clearAllData;
+
+        window.downloadCSV = downloadCSV;
+        window.copyToClipboardTSV = copyToClipboardTSV;
+        window.downloadParticipantReport = downloadParticipantReport;
+        window.openQrModal = openQrModal;
+        window.closeQrModal = closeQrModal;
+        window.handleUrlOverride = handleUrlOverride;
+
+        window.onload = () => {
+            setupCharts();
+            init();
+        };
+
+    </script>
+</body>
+</html>
